@@ -10,4 +10,8 @@ serde_json = "1.0"
 tokio = { version = "1.0", features = ["full"] }
 env_logger = "0.10"
 log = "0.4"
-dotenv = "0.15" 
+dotenv = "0.15"
+kdapp = { git = "https://github.com/michaelsutton/kdapp" }
+kaspa-consensus-core = { git = "https://github.com/kaspanet/rusty-kaspa", tag = "v1.0.0" }
+kaspa-rpc-core = { git = "https://github.com/kaspanet/rusty-kaspa", tag = "v1.0.0" }
+kaspa-addresses = { git = "https://github.com/kaspanet/rusty-kaspa", tag = "v1.0.0" } 

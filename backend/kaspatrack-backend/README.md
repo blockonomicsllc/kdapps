@@ -1,126 +1,197 @@
-# KaspaTrack Backend
+# KaspaTrack Backend Deployment SOP
 
-A Rust-based backend service for the KaspaTrack application.
+This guide provides a **step-by-step, beginner-friendly process** for deploying the KaspaTrack backend. Each step includes a brief explanation so anyone—regardless of coding experience—can follow along and understand the purpose behind each action.
 
-## Features
+---
 
-- Health check endpoint
-- Basic API structure
-- Docker support
-- Environment-based configuration
+## Table of Contents
+1. [Overview](#overview)
+2. [Prerequisites](#prerequisites)
+3. [Deployment Methods](#deployment-methods)
+    - [A. WSL/Linux Deployment](#a-wsllinux-deployment)
+    - [B. Windows (PowerShell) Deployment](#b-windows-powershell-deployment)
+    - [C. Docker Deployment (Recommended for Production)](#c-docker-deployment-recommended-for-production)
+4. [Environment Configuration](#environment-configuration)
+5. [Testing the Deployment](#testing-the-deployment)
+6. [Troubleshooting](#troubleshooting)
+7. [Project Structure](#project-structure)
+
+---
+
+## Overview
+KaspaTrack Backend is a Rust-based web service. You can deploy it on Windows, Linux, or using Docker. This guide covers all methods, with clear explanations for each step.
+
+---
 
 ## Prerequisites
+- **For WSL/Linux:**
+  - [Rust toolchain](https://rustup.rs/) (provides `cargo` and `rustc`)
+- **For Windows:**
+  - [Rust toolchain](https://rustup.rs/) (provides `cargo` and `rustc`)
+  - PowerShell (comes with Windows)
+- **For Docker deployment:**
+  - [Docker Desktop](https://www.docker.com/products/docker-desktop/) installed and running
 
-- Rust (latest stable version)
-- Docker (optional, for containerized deployment)
+*If you are unsure which method to use, Docker is recommended for production and easiest for consistent results.*
 
-## Quick Start
+---
 
-### Local Development
+## Deployment Methods
 
-1. **Clone and navigate to the project:**
+### A. WSL/Linux Deployment
+**Use this if you have Rust installed on WSL or a Linux machine.**
+
+1. **Open your terminal and navigate to the project directory**
    ```bash
-   cd kaspatrack/backend/kaspatrack-backend
+   cd /mnt/c/Users/bless/OneDrive/Documents/kdapps/kaspatrack/kdapps/backend/kaspatrack-backend
    ```
+   *// This puts you in the folder containing the backend code.*
 
-2. **Build the project:**
+2. **Copy the environment template to create your config file**
    ```bash
-   cargo build
+   cp env.example .env
    ```
+   *// This creates a `.env` file for configuration. You can edit it if you want to change the server port or other settings.*
 
-3. **Run the server:**
+3. **Build the backend (optimized for production)**
+   ```bash
+   cargo build --release
+   ```
+   *// This compiles the backend into a fast, standalone executable.*
+
+4. **Run the backend server**
+   ```bash
+   ./target/release/kaspatrack-backend
+   ```
+   *// This starts the server. Leave this terminal open to keep it running.*
+
+5. **(Optional) For development, use:**
    ```bash
    cargo run
    ```
+   *// This runs the server in development mode (slower, but easier for testing changes).* 
 
-   Or use the build script:
-   ```bash
-   chmod +x build.sh
-   ./build.sh --run
+---
+
+### B. Windows (PowerShell) Deployment
+**Use this if you have Rust installed on Windows.**
+
+1. **Open PowerShell and navigate to the project directory**
+   ```powershell
+   cd "C:\Users\bless\OneDrive\Documents\kdapps\kaspatrack\kdapps\backend\kaspatrack-backend"
    ```
+   *# This puts you in the backend folder.*
 
-4. **Test the endpoints:**
-   - Health check: `http://localhost:8080/health`
-   - API info: `http://localhost:8080/api/info`
-   - Root: `http://localhost:8080/`
-
-### Docker Deployment
-
-1. **Build the Docker image:**
-   ```bash
-   docker build -t kaspatrack-backend .
+2. **Copy the environment template to create your config file**
+   ```powershell
+   Copy-Item env.example .env
    ```
+   *# This creates a `.env` file for configuration. Edit it if you want to change settings.*
 
-2. **Run with Docker:**
-   ```bash
-   docker run -p 8080:8080 kaspatrack-backend
+3. **Build and run using the provided script**
+   - If you see a script execution error, run PowerShell as Administrator and execute:
+     ```powershell
+     Set-ExecutionPolicy -Scope CurrentUser -ExecutionPolicy RemoteSigned
+     ```
+     *# This allows local scripts to run. Only needs to be done once.*
+   - Then run:
+     ```powershell
+     .\build.ps1 -Run
+     ```
+   *# This builds and starts the backend server. Leave this window open to keep it running.*
+
+4. **(Alternative) Build and run manually**
+   ```powershell
+   cargo build --release
+   .\target\release\kaspatrack-backend.exe
    ```
+   *# This does the same as the script, but step-by-step.*
 
-3. **Or use Docker Compose:**
+---
+
+### C. Docker Deployment (Recommended for Production)
+**Use this for the easiest and most reliable deployment, especially on servers.**
+
+1. **Open a terminal and navigate to the backend directory**
+   ```bash
+   cd /mnt/c/Users/bless/OneDrive/Documents/kdapps/kaspatrack/kdapps/backend/kaspatrack-backend
+   ```
+   *// Or use the equivalent Windows path in PowerShell.*
+
+2. **Build and start the backend using Docker Compose**
    ```bash
    docker-compose up -d
    ```
+   *// This builds the Docker image and starts the backend in the background.*
 
-## Environment Variables
+3. **(Alternative) Build and run manually with Docker**
+   ```bash
+   docker build -t kaspatrack-backend .
+   docker run -d -p 8080:8080 --name kaspatrack-backend kaspatrack-backend
+   ```
+   *// This does the same as Docker Compose, but step-by-step.*
 
-Copy `env.example` to `.env` and modify as needed:
+4. **To stop the backend**
+   ```bash
+   docker-compose down
+   # or
+   docker stop kaspatrack-backend && docker rm kaspatrack-backend
+   ```
+   *// This stops and removes the running backend container.*
 
-```bash
-cp env.example .env
-```
+---
 
-Available variables:
-- `PORT`: Server port (default: 8080)
-- `HOST`: Server host (default: 127.0.0.1)
-- `RUST_LOG`: Log level (default: info)
+## Environment Configuration
 
-## API Endpoints
+- The backend uses a `.env` file for configuration.
+- To customize, edit `.env` after copying from `env.example`.
+- Common settings:
+  - `PORT`: The port the server listens on (default: 8080)
+  - `HOST`: The network interface (use `0.0.0.0` to allow access from other devices)
+  - `RUST_LOG`: Log level (default: info)
 
-- `GET /health` - Health check endpoint
-- `GET /api/info` - API information
-- `GET /` - Root endpoint
+---
 
-## Deployment
+## Testing the Deployment
 
-### Production Build
+1. **Check if the server is running:**
+   ```bash
+   curl http://localhost:8080/health
+   ```
+   *// You should see a healthy status response, e.g. `{ "status": "healthy" }`*
 
-```bash
-cargo build --release
-```
+2. **Other endpoints:**
+   - `http://localhost:8080/api/info` — API information
+   - `http://localhost:8080/` — Root endpoint
 
-The optimized binary will be available at `target/release/kaspatrack-backend`.
+---
 
-### Docker Production
+## Troubleshooting
+- **Rust not found:** Install from [https://rustup.rs/](https://rustup.rs/) and restart your terminal.
+- **Script execution error (Windows):** Set execution policy as shown above.
+- **Port already in use:** Change the `PORT` in your `.env` file.
+- **Docker issues:** Ensure Docker Desktop is running and you have permissions.
+- **Permission denied (Linux/WSL):** Run `chmod +x build.sh` to make scripts executable.
 
-```bash
-docker build -t kaspatrack-backend:latest .
-docker run -d -p 8080:8080 --name kaspatrack-backend kaspatrack-backend:latest
-```
+---
 
-## Development
-
-### Adding New Endpoints
-
-1. Add your handler function in `src/main.rs`
-2. Register the route in the `App::new()` configuration
-3. Test your endpoint
-
-### Project Structure
-
+## Project Structure
 ```
 kaspatrack-backend/
 ├── src/
-│   └── main.rs          # Main application entry point
+│   └── main.rs          # Main application code
 ├── Cargo.toml           # Rust project configuration
-├── Dockerfile           # Docker configuration
-├── docker-compose.yml   # Docker Compose configuration
-├── build.sh            # Build script
-├── env.example         # Environment variables template
-└── README.md           # This file
+├── Dockerfile           # Docker build instructions
+├── docker-compose.yml   # Docker Compose setup
+├── build.sh             # Linux/WSL build script
+├── build.ps1            # Windows PowerShell build script
+├── env.example          # Environment variable template
+├── .env                 # (Created by you) Actual environment config
+└── README.md            # This file
 ```
 
-## Troubleshooting
+---
 
-- **Port already in use:** Change the `PORT` environment variable
-- **Build errors:** Ensure you have the latest Rust toolchain installed
-- **Docker issues:** Make sure Docker is running and you have sufficient permissions 
+**You are now ready to deploy the KaspaTrack backend!**
+- If you have any issues, check the Troubleshooting section above.
+- For production, Docker is recommended for reliability and ease of use. 
