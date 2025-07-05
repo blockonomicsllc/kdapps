@@ -271,6 +271,26 @@ cargo run
 
 ---
 
+🏗️ WHY A KASPA NODE IS REQUIRED
+🔍 Core Understanding: Backend Cannot Work Without a Node
+The KaspaTrack backend cannot function independently. It requires a Kaspa node because:
+1. Data Source Requirement
+Backend needs real-time blockchain data to track addresses
+Only a Kaspa node can provide this data - it's the authoritative source
+No external APIs or services can replace this requirement
+2. UTXO (Unspent Transaction Output) Access
+Portfolio tracking requires UTXO data - what coins an address owns
+Only a synced node can provide UTXO information
+Backend queries the node every 10 seconds for updated balance
+3. Network Connectivity
+Backend connects to the Kaspa network through the node
+Node validates and processes transactions from the network
+Backend acts as a "client" to the node's "server"
+4. Real-time Updates
+Node receives new blocks and transactions from the network
+Backend polls the node for address balance changes
+Without node = no real-time data
+
 ## �� Success Criteria
 
 **Deployment is successful when:**
