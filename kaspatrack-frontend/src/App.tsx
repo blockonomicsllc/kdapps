@@ -1,15 +1,23 @@
+// App.tsx - Main React application file for KaspaTrack frontend
+// This file defines the main dashboard UI, handles portfolio tracking, and integrates with the Portfolio context/provider.
+// QA/Developers: This is the entry point for the user interface, where users can input a Kaspa address and view live portfolio data.
+
+// Import React and hooks for building the UI
 import React, { useEffect } from 'react';
+// Import global styles
 import './App.css';
+// Import context and input component for portfolio tracking
 import { PortfolioProvider, usePortfolio } from './contexts/PortfolioContext';
 import PortfolioInput from './components/PortfolioInput';
 
+// Define navigation links for the dashboard
 const navLinks = [
-  { label: 'Portfolio', active: true },
-  { label: 'Kaspa' },
-  { label: 'Crypto' },
-  { label: 'Stocks' },
-  { label: 'ETFs' },
-  { label: 'Dividends' },
+  { label: 'Portfolio', active: true }, // Main portfolio tab
+  { label: 'Kaspa' }, // Kaspa-specific tab
+  { label: 'Crypto' }, // Crypto assets tab
+  { label: 'Stocks' }, // Stocks tab
+  { label: 'ETFs' }, // ETFs tab
+  { label: 'Dividends' }, // Dividends tab
 ];
 
 const stats = [
@@ -86,14 +94,17 @@ const activities = [
   },
 ];
 
+// Main content component for the dashboard
 function AppContent() {
+  // Use the portfolio context to get state and actions
   const { portfolio, loading, trackedAddress } = usePortfolio();
 
-  // Use real data from backend if available, otherwise use mock data
+  // Define the stats to display, using real data if available
   const stats = [
     {
       title: 'Total Portfolio Value',
       icon: '💼',
+      // Defensive check: only display value if available
       value: portfolio && portfolio.kaspa_holdings !== undefined ? `${portfolio.kaspa_holdings.toLocaleString()} KAS` : 'N/A',
       change: '+12.4% this month',
       positive: true,
@@ -122,22 +133,23 @@ function AppContent() {
     {
       title: 'Crypto Assets',
       icon: '₿',
-      value: '$45,280',
+      value: '$45,280', // Placeholder for future crypto integration
       change: '+15.2% this month',
       positive: true,
     },
     {
       title: 'Decentralized Score',
       icon: '🛡️',
-      value: '98.7%',
+      value: '98.7%', // Placeholder for future analytics
       change: 'Zero 3rd party risk',
       positive: true,
     },
   ];
 
+  // Render the dashboard UI
   return (
     <div className="dashboard-container">
-      {/* Header */}
+      {/* Header section with logo and navigation */}
       <header className="header">
         <div className="header-content">
           <div className="logo-section">
@@ -161,16 +173,17 @@ function AppContent() {
 
       {/* Main Content */}
       <main className="main-content">
-        {/* Hero Section */}
+        {/* Hero Section with title, subtitle, and address input */}
         <section className="hero-section slide-in">
           <h1 className="hero-title">KaspaTrack Portfolio</h1>
           <p className="hero-subtitle">
             Decentralized portfolio tracking for Kaspa, crypto, stocks, ETFs & dividends - Zero third-party risk on BlockDAG
           </p>
+          {/* Address input for tracking a portfolio */}
           <PortfolioInput />
         </section>
 
-        {/* Stats Grid */}
+        {/* Stats Grid - shows portfolio stats */}
         <section className="stats-grid">
           {stats.map((stat) => (
             <div className="stat-card slide-in" key={stat.title}>
@@ -187,7 +200,7 @@ function AppContent() {
           ))}
         </section>
 
-        {/* Chart Section */}
+        {/* Chart Section - placeholder for future chart integration */}
         <section className="chart-section slide-in">
           <div className="chart-header">
             <h2 className="chart-title">Portfolio Performance</h2>
@@ -203,22 +216,21 @@ function AppContent() {
           </div>
         </section>
 
-        {/* Activity Feed */}
+        {/* Activity Feed - placeholder for recent activity */}
         <section className="activity-section slide-in">
           <div className="activity-header">
             <h2 className="activity-title">Recent Portfolio Activity</h2>
           </div>
           <div className="activity-feed">
-            {activities.map((activity, idx) => (
-              <div className="activity-item" key={idx}>
-                <div className={`activity-dot${activity.pulse ? ' pulse' : ''}`}></div>
-                <div className="activity-content">
-                  <div className="activity-text">{activity.text}</div>
-                  <div className="activity-time">{activity.time}</div>
-                </div>
-                <div className="activity-value">{activity.value}</div>
+            {/* Placeholder activities - replace with real data in future */}
+            <div className="activity-item">
+              <div className="activity-dot pulse"></div>
+              <div className="activity-content">
+                <div className="activity-text">Kaspa price updated - decentralized feed</div>
+                <div className="activity-time">2 minutes ago</div>
               </div>
-            ))}
+              <div className="activity-value">$0.127</div>
+            </div>
           </div>
         </section>
       </main>
@@ -226,6 +238,7 @@ function AppContent() {
   );
 }
 
+// Main App component wraps everything in the PortfolioProvider context
 function App() {
   return (
     <PortfolioProvider>
