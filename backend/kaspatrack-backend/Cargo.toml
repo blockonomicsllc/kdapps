@@ -14,4 +14,6 @@ dotenv = "0.15"
 kdapp = { git = "https://github.com/michaelsutton/kdapp" }
 kaspa-consensus-core = { git = "https://github.com/kaspanet/rusty-kaspa", tag = "v1.0.0" }
 kaspa-rpc-core = { git = "https://github.com/kaspanet/rusty-kaspa", tag = "v1.0.0" }
-kaspa-addresses = { git = "https://github.com/kaspanet/rusty-kaspa", tag = "v1.0.0" } 
+kaspa-addresses = { git = "https://github.com/kaspanet/rusty-kaspa", tag = "v1.0.0" }
+chrono = { version = "0.4", features = ["serde"] }
+actix-cors = "0.7" 

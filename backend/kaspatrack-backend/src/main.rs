@@ -9,6 +9,10 @@ use serde::Serialize;
 use std::sync::{Arc, Mutex};
 use tokio::sync::Notify;
 use std::env;
+use serde_json;
+use chrono::Utc;
+use actix_cors::Cors;
+use actix_web::http;
 
 #[derive(Default, Serialize, Clone)]
 struct PortfolioData {
@@ -117,19 +121,87 @@ async fn main() -> std::io::Result<()> {
         HttpResponse::Ok().json(p)
     }
 
-    // Get server configuration
-    let port = env::var("PORT").unwrap_or_else(|_| "8080".to_string()).parse().unwrap_or(8080);
-    let host = env::var("HOST").unwrap_or_else(|_| "127.0.0.1".to_string());
+    async fn health_check() -> impl Responder {
+        HttpResponse::Ok().json(serde_json::json!({
+            "status": "ok",
+            "timestamp": chrono::Utc::now().to_rfc3339()
+        }))
+    }
 
-    log::info!("Starting REST API server on {}:{}", host, port);
+    // Handler for /api/portfolio/{address}
+    async fn get_portfolio_by_address(
+        path: web::Path<String>,
+    ) -> impl Responder {
+        let address_str = path.into_inner();
+        // Parse the address
+        let address = Address::constructor(&address_str);
+
+        // Load configuration for network and node
+        let network_type = env::var("KASPA_NETWORK").unwrap_or_else(|_| "testnet".to_string());
+        let net_suffix: u32 = env::var("KASPA_NETSUFFIX").unwrap_or_else(|_| "10".to_string()).parse().unwrap_or(10);
+        let wrpc_url = env::var("KASPA_WRPC_URL").unwrap_or_else(|_| "http://127.0.0.1:16610".to_string());
+
+        // Determine network type
+        let network_type_enum = match network_type.to_lowercase().as_str() {
+            "mainnet" => NetworkType::Mainnet,
+            "testnet" => NetworkType::Testnet,
+            "devnet" => NetworkType::Devnet,
+            "simnet" => NetworkType::Simnet,
+            _ => NetworkType::Testnet,
+        };
+        let network = NetworkId::with_suffix(network_type_enum, net_suffix);
+
+        // Connect to the Kaspa node
+        let kaspad = match connect_client(network, Some(wrpc_url.clone())).await {
+            Ok(client) => client,
+            Err(e) => {
+                return HttpResponse::InternalServerError().body(format!("Failed to connect to Kaspa node: {}", e));
+            }
+        };
+
+        // Construct the RPC request
+        let request = GetUtxosByAddressesRequest {
+            addresses: vec![address.clone()],
+        };
+
+        // Get UTXOs for the address
+        match kaspad.get_utxos_by_addresses_call(None, request).await {
+            Ok(response) => {
+                let total: u64 = response.entries.iter().map(|entry| entry.utxo_entry.amount).sum();
+                HttpResponse::Ok().json(serde_json::json!({
+                    "address": address_str,
+                    "kaspa_holdings": total
+                }))
+            }
+            Err(e) => {
+                HttpResponse::InternalServerError().body(format!("Failed to get UTXOs: {}", e))
+            }
+        }
+    }
+
+    // Get server configuration
+    let host = env::var("HOST").unwrap_or_else(|_| "127.0.0.1".to_string());
+    let port = env::var("PORT").unwrap_or_else(|_| "8080".to_string());
+    let bind_addr = format!("{}:{}", host, port);
+
+    log::info!("Starting REST API server on {}", bind_addr);
 
     // Start REST API
     HttpServer::new(move || {
         App::new()
+            .wrap(
+                Cors::default()
+                    .allowed_origin("http://localhost:3000")
+                    .allowed_methods(vec!["GET", "POST", "OPTIONS"])
+                    .allowed_headers(vec![http::header::CONTENT_TYPE])
+                    .max_age(3600)
+            )
             .app_data(web::Data::new((portfolio_api.clone(), notify_api.clone())))
             .route("/api/portfolio", web::get().to(get_portfolio))
+            .route("/health", web::get().to(health_check))
+            .route("/api/portfolio/{address}", web::get().to(get_portfolio_by_address))
     })
-    .bind((host, port))?
+    .bind(bind_addr)?
     .run()
     .await
 }

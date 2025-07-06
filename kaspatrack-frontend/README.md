@@ -1,4 +1,75 @@
-# Getting Started with Create React App
+# KaspaTrack Frontend
+
+A React-based frontend for the KaspaTrack portfolio tracking application. This frontend connects to the KaspaTrack backend to display real-time portfolio data for Kaspa addresses.
+
+## Features
+
+- Real-time portfolio tracking
+- Address input and validation
+- Live balance updates
+- Transaction history display
+- Responsive design with your brand colors (#70C7BA and #F7931A)
+
+## Quick Start
+
+### 1. Install Dependencies
+```bash
+npm install
+```
+
+### 2. Configure Backend Connection
+Copy the example environment file and update it with your backend URL:
+
+```bash
+cp env.example .env.local
+```
+
+Edit `.env.local` and set your backend URL:
+```
+REACT_APP_API_URL=http://localhost:8080
+```
+
+### 3. Start the Development Server
+```bash
+npm start
+```
+
+The app will open at [http://localhost:3000](http://localhost:3000).
+
+## Connecting to Backend
+
+1. Make sure your KaspaTrack backend is running (see backend README)
+2. Enter a Kaspa address in the input field
+3. Click "Track Portfolio" to start monitoring
+4. The dashboard will show real-time balance and transaction data
+
+## Available Scripts
+
+- `npm start` - Start development server
+- `npm build` - Build for production
+- `npm test` - Run tests
+- `npm eject` - Eject from Create React App
+
+## Environment Variables
+
+- `REACT_APP_API_URL` - Backend API URL (default: http://localhost:8080)
+- `REACT_APP_ENV` - Environment (development/production)
+- `REACT_APP_KASPA_NETWORK` - Kaspa network (testnet-10/mainnet)
+
+## Architecture
+
+- **API Service** (`src/services/api.ts`) - Handles backend communication
+- **Portfolio Context** (`src/contexts/PortfolioContext.tsx`) - State management
+- **Components** - Reusable UI components
+- **App.tsx** - Main application component
+
+## Troubleshooting
+
+- **Connection Error**: Make sure your backend is running and the API URL is correct
+- **CORS Issues**: Ensure your backend allows requests from localhost:3000
+- **Address Not Found**: Verify the Kaspa address format and network
+
+---
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 

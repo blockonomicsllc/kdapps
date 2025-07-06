@@ -1,5 +1,7 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import './App.css';
+import { PortfolioProvider, usePortfolio } from './contexts/PortfolioContext';
+import PortfolioInput from './components/PortfolioInput';
 
 const navLinks = [
   { label: 'Portfolio', active: true },
@@ -84,7 +86,55 @@ const activities = [
   },
 ];
 
-function App() {
+function AppContent() {
+  const { portfolio, loading, trackedAddress } = usePortfolio();
+
+  // Use real data from backend if available, otherwise use mock data
+  const stats = [
+    {
+      title: 'Total Portfolio Value',
+      icon: '💼',
+      value: portfolio && portfolio.kaspa_holdings !== undefined ? `${portfolio.kaspa_holdings.toLocaleString()} KAS` : 'N/A',
+      change: '+12.4% this month',
+      positive: true,
+    },
+    {
+      title: 'Kaspa Holdings',
+      icon: '🔸',
+      value: portfolio && portfolio.kaspa_holdings !== undefined ? `${portfolio.kaspa_holdings.toLocaleString()} KAS` : 'N/A',
+      change: portfolio ? `Last updated: ${new Date().toLocaleTimeString()}` : '+8.7% this week',
+      positive: true,
+    },
+    {
+      title: 'Tracked Address',
+      icon: '📍',
+      value: trackedAddress ? `${trackedAddress.slice(0, 8)}...${trackedAddress.slice(-8)}` : 'Not set',
+      change: trackedAddress ? 'Connected to backend' : 'Enter address to track',
+      positive: !!trackedAddress,
+    },
+    {
+      title: 'Backend Status',
+      icon: '🔗',
+      value: loading ? 'Connecting...' : (portfolio ? 'Connected' : 'Disconnected'),
+      change: portfolio ? 'Real-time updates' : 'No connection',
+      positive: !!portfolio,
+    },
+    {
+      title: 'Crypto Assets',
+      icon: '₿',
+      value: '$45,280',
+      change: '+15.2% this month',
+      positive: true,
+    },
+    {
+      title: 'Decentralized Score',
+      icon: '🛡️',
+      value: '98.7%',
+      change: 'Zero 3rd party risk',
+      positive: true,
+    },
+  ];
+
   return (
     <div className="dashboard-container">
       {/* Header */}
@@ -117,6 +167,7 @@ function App() {
           <p className="hero-subtitle">
             Decentralized portfolio tracking for Kaspa, crypto, stocks, ETFs & dividends - Zero third-party risk on BlockDAG
           </p>
+          <PortfolioInput />
         </section>
 
         {/* Stats Grid */}
@@ -172,6 +223,14 @@ function App() {
         </section>
       </main>
     </div>
+  );
+}
+
+function App() {
+  return (
+    <PortfolioProvider>
+      <AppContent />
+    </PortfolioProvider>
   );
 }
 

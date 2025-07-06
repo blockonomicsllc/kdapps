@@ -399,3 +399,88 @@ body {
 .slide-in {
   animation: slideIn 0.6s ease-out;
 }
+
+/* Portfolio Input Styles */
+.portfolio-input {
+  margin: 2rem 0;
+  text-align: center;
+}
+
+.portfolio-input form {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.address-input {
+  padding: 0.75rem 1rem;
+  border: 2px solid rgba(112, 199, 186, 0.3);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.05);
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 1rem;
+  min-width: 300px;
+  transition: all 0.3s ease;
+}
+
+.address-input:focus {
+  outline: none;
+  border-color: #70C7BA;
+  box-shadow: 0 0 0 3px rgba(112, 199, 186, 0.1);
+}
+
+.track-btn {
+  padding: 0.75rem 1.5rem;
+  background: #70C7BA;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.track-btn:hover:not(:disabled) {
+  background: #5bb8a9;
+  transform: translateY(-2px);
+}
+
+.track-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.error-message {
+  color: #ff6b6b;
+  margin-top: 1rem;
+  padding: 0.5rem;
+  background: rgba(255, 107, 107, 0.1);
+  border-radius: 4px;
+  border: 1px solid rgba(255, 107, 107, 0.3);
+}
+
+/* Loading States */
+.stat-card.loading {
+  opacity: 0.7;
+  pointer-events: none;
+}
+
+.stat-card.loading .stat-value::after {
+  content: '';
+  display: inline-block;
+  width: 1rem;
+  height: 1rem;
+  border: 2px solid rgba(112, 199, 186, 0.3);
+  border-top: 2px solid #70C7BA;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin-left: 0.5rem;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
